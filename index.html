@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>جزيرة الرياضيات | مغامرة تعلم تفاعلية للأطفال</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="تطبيق جزيرة الرياضيات يحول تعلم الحساب والهندسة والأنماط والألغاز البصرية إلى مغامرة ممتعة تشبه ألعاب الفيديو للجيل الناشئ.">
+  <meta name="theme-color" content="#2c1a4d">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <!-- Favicon / Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Main Game Box (Feels like a standalone app window) -->
+  <main id="game-container" aria-label="شاشة اللعبة الرئيسية">
+    
+    <!-- Top HUD / Dashboard Dashboard -->
+    <header>
+      <div class="logo-section">
+        <h1><span>🏝️</span> جزيرة الرياضيات</h1>
+      </div>
+      
+      <div class="player-stats">
+        <!-- Level Badge -->
+        <div class="stat-badge level" id="player-level">مستوى 1</div>
+        
+        <!-- XP Bar -->
+        <div class="xp-container" aria-label="مستوى الخبرة الحالي">
+          <div class="xp-label">
+            <span>الخبرة XP</span>
+            <span id="xp-text">0/100 XP</span>
+          </div>
+          <div class="xp-bar-bg">
+            <div class="xp-bar-fill" id="xp-fill"></div>
+          </div>
+        </div>
+
+        <!-- Gold Stars Currency Badge -->
+        <div class="stat-badge stars" id="stars-badge" aria-label="رصيد النجوم السحرية">
+          <span id="stars-count">0</span>
+          <span>🌟</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Install PWA Button -->
+        <button id="pwa-install-btn" class="pwa-btn" aria-label="تثبيت التطبيق">
+          <span>📲</span> تثبيت التطبيق
+        </button>
+        <!-- Sound Toggle Button -->
+        <button id="mute-btn" class="icon-btn" aria-label="تشغيل أو إيقاف الصوت">🔊</button>
+      </div>
+    </header>
+
+    <!-- Center Screen Contents -->
+    <section class="screen-content" aria-live="polite">
+
+      <!-- SCREEN 1: Map (خريطة المستويات) -->
+      <div id="map-screen" class="game-screen active">
+        <div class="map-layout">
+          <div class="map-intro">
+            أهلاً بك يا بطل! اختر إحدى المناطق السحرية لحل التحديات وجمع <span>النجوم السحرية 🌟</span> لتطوير أليفك وبناء مدينتك.
+          </div>
+          
+          <div class="island-regions">
+            <!-- Region 1: Arithmetic -->
+            <div class="region-card" data-region="arithmetic">
+              <div class="region-theme-bg">🧮</div>
+              <div class="region-info">
+                <h2 class="region-title">غابة الأرقام</h2>
+                <p class="region-desc">تحديات الحساب والجمع والطرح والضرب لتنمية مهارات التفكير السريع والبديهة الرياضية.</p>
+              </div>
+              <div class="region-progress">
+                <div class="region-levels-container"></div>
+              </div>
+            </div>
+
+            <!-- Region 2: Patterns -->
+            <div class="region-card locked" data-region="patterns">
+              <div class="region-theme-bg">➔</div>
+              <div class="region-info">
+                <h2 class="region-title">وادي الأنماط</h2>
+                <p class="region-desc">اكتشف القواعد السرية للتسلسلات العددية والأنماط البصرية الملونة وأكمل الفراغات كالمحققين.</p>
+              </div>
+              <div class="region-progress">
+                <div class="region-levels-container"></div>
+              </div>
+            </div>
+
+            <!-- Region 3: Geometry -->
+            <div class="region-card locked" data-region="geometry">
+              <div class="region-theme-bg">📐</div>
+              <div class="region-info">
+                <h2 class="region-title">جبل الأشكال</h2>
+                <p class="region-desc">مملكة الهندسة! ميز الأشكال، عد أضلاعها، تعرف على الزوايا وافهم الكسور بالألعاب الملونة.</p>
+              </div>
+              <div class="region-progress">
+                <div class="region-levels-container"></div>
+              </div>
+            </div>
+
+            <!-- Region 4: Logic Puzzles -->
+            <div class="region-card locked" data-region="logic">
+              <div class="region-theme-bg">🔑</div>
+              <div class="region-info">
+                <h2 class="region-title">شاطئ الألغاز</h2>
+                <p class="region-desc">ألغاز ذكاء بصرية، معادلات الرموز السحرية، وتوازن الموازين لتعلم التحليل وحل المشكلات المعقدة.</p>
+              </div>
+              <div class="region-progress">
+                <div class="region-levels-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: Pet Companion (شاشة المرافق الأليف) -->
+      <div id="pet-screen" class="game-screen">
+        <!-- Pet Selection Screen Overlay (Visible if no pet selected) -->
+        <div id="pet-selection-overlay" class="pet-selection-overlay" style="display: none;">
+          <h2 class="selection-title">اختر مرافقك السحري!</h2>
+          <p class="selection-desc">اختر كائناً أليفاً ليرافقك في رحلتك الرياضية. سيتطور شكله وتزداد قدراته كلما حللت مسائل أكثر!</p>
+          
+          <div class="pet-options-grid">
+            <!-- Option 1: Fire Dragon -->
+            <div class="pet-select-card" data-pet-type="dragon">
+              <svg viewBox="0 0 100 100">
+                <ellipse cx="50" cy="55" rx="18" ry="22" fill="#ff4a4a"/>
+                <circle cx="50" cy="30" r="14" fill="#ff4a4a"/>
+                <circle cx="45" cy="27" r="2.5" fill="#fff"/><circle cx="45" cy="27" r="1" fill="#000"/>
+                <circle cx="55" cy="27" r="2.5" fill="#fff"/><circle cx="55" cy="27" r="1" fill="#000"/>
+                <polygon points="50,16 47,4 41,12" fill="#ffa000"/>
+                <polygon points="50,16 53,4 59,12" fill="#ffa000"/>
+                <path d="M45,35 Q50,40 55,35" stroke="#000" stroke-width="1.5" fill="none"/>
+              </svg>
+              <span class="pet-select-name">تنين النار (لهبوش) 🐉</span>
+              <span class="pet-select-desc">شجاع وقوي، يحب المغامرة وتخطي الصعاب بذكائه المتوقد.</span>
+            </div>
+
+            <!-- Option 2: Lightning Phoenix -->
+            <div class="pet-select-card" data-pet-type="phoenix">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="55" r="18" fill="#ffb800"/>
+                <circle cx="50" cy="32" r="14" fill="#ffb800"/>
+                <circle cx="45" cy="28" r="2.5" fill="#fff"/><circle cx="45" cy="28" r="1" fill="#000"/>
+                <circle cx="55" cy="28" r="2.5" fill="#fff"/><circle cx="55" cy="28" r="1" fill="#000"/>
+                <polygon points="50,32 47,38 53,38" fill="#ff5500"/>
+                <path d="M50,18 Q45,8 50,4" stroke="#ff5500" stroke-width="3" fill="none"/>
+              </svg>
+              <span class="pet-select-name">عنقاء البرق (شرارة) ⚡</span>
+              <span class="pet-select-desc">سريعة كالضوء، تحب المسائل الحسابية وحل الأنماط بدقة مذهلة.</span>
+            </div>
+
+            <!-- Option 3: Magic Wizard Kitty -->
+            <div class="pet-select-card" data-pet-type="kitty">
+              <svg viewBox="0 0 100 100">
+                <ellipse cx="50" cy="58" rx="15" ry="17" fill="#9b51e0"/>
+                <circle cx="50" cy="36" r="14" fill="#9b51e0"/>
+                <polygon points="37,28 31,14 42,24" fill="#9b51e0"/>
+                <polygon points="63,28 69,14 58,24" fill="#9b51e0"/>
+                <circle cx="45" cy="34" r="3" fill="#fff"/><circle cx="45" cy="34" r="1" fill="#000"/>
+                <circle cx="55" cy="34" r="3" fill="#fff"/><circle cx="55" cy="34" r="1" fill="#000"/>
+                <polygon points="50,38 48,36 52,36" fill="#ff4a7d"/>
+                <polygon points="50,12 42,24 58,24" fill="#3a006f"/>
+              </svg>
+              <span class="pet-select-name">القط الساحري (مشمش) 🐱</span>
+              <span class="pet-select-desc">ذكي وغامض، يعشق قراءة المخططات الهندسية وحل المسائل المعقدة.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Pet Interaction Area -->
+        <div class="pet-layout">
+          <!-- Visual Left Section -->
+          <div class="pet-avatar-card">
+            <div class="pet-visual-area" id="pet-visual">
+              <!-- Rendered via JS -->
+            </div>
+            <h2 id="pet-name" class="pet-evolution-title">أليفك السحري</h2>
+            <div id="pet-type" class="pet-type-label">مستوى 1</div>
+          </div>
+
+          <!-- Stats Right Section -->
+          <div class="pet-stats-panel">
+            <div>
+              <div class="pet-status-header">
+                <span>حالة الأليف</span>
+                <span class="pet-level-badge" id="pet-level">مستوى 1</span>
+              </div>
+              
+              <div class="pet-progress-group">
+                <!-- Energy Bar -->
+                <div class="progress-row">
+                  <div class="progress-label">
+                    <span>⚡ الطاقة (للعب بها)</span>
+                    <span id="pet-energy-text">50/100</span>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill energy" id="pet-energy-fill"></div>
+                  </div>
+                </div>
+                
+                <!-- Pet XP Bar -->
+                <div class="progress-row">
+                  <div class="progress-label">
+                    <span>🧬 نقاط التطور (XP)</span>
+                    <span id="pet-xp-text">0/50</span>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill xp" id="pet-xp-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pet Actions -->
+            <div class="pet-actions">
+              <button class="action-btn" id="feed-btn" aria-label="إطعام الأليف لزيادة طاقته">
+                🍎 أطعم الأليف (مخزونك: 0)
+              </button>
+              <button class="action-btn secondary" id="play-pet-btn" aria-label="اللعب مع الأليف لكسب المكافآت">
+                🎮 العب معه (يستهلك 15 طاقة ويكسبك 5 🌟 و 12 XP)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: Magic Town (المدينة السحرية) -->
+      <div id="town-screen" class="game-screen">
+        <div class="town-layout">
+          <!-- 6x6 Board -->
+          <div class="town-grid-container">
+            <div class="town-board" id="town-board" role="grid" aria-label="رقعة بناء المدينة السحرية">
+              <!-- Grid items populated via JS -->
+            </div>
+          </div>
+
+          <!-- Inventory and control side panel -->
+          <div class="town-sidebar">
+            <div>
+              <h2 class="sidebar-title">مدينتي السحرية 🏰</h2>
+              <p class="sidebar-instructions">
+                شيد مدينتك الرياضية!
+                <br>
+                1. اختر مبنى أو زينة من حقيبتك بالأسفل.
+                2. اضغط على أي مربع فارغ في الرقعة لوضعه.
+                3. لنقل عنصر أو حذفه، اضغط عليه في الرقعة ليعود للحقيبة.
+              </p>
+              
+              <div class="inventory-header">حقيبة المباني الخاصة بك</div>
+              <div class="town-inventory-list" id="town-inventory-list">
+                <!-- Inventory populated via JS -->
+              </div>
+            </div>
+            
+            <button class="action-btn secondary town-clear-btn" id="clear-town-btn" aria-label="إزالة جميع المباني من الرقعة">
+              🧹 إخلاء جميع المباني
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: Shop (المتجر السحري) -->
+      <div id="shop-screen" class="game-screen">
+        <div class="shop-layout">
+          <div class="shop-category-tabs">
+            <button class="shop-tab active" data-category="food" aria-label="تبويب شراء الأطعمة للحيوان الأليف">🍖 أطعمة الأليف</button>
+            <button class="shop-tab" data-category="town" aria-label="تبويب شراء زينة لمدينتك">🏡 مباني وزينة المدينة</button>
+          </div>
+          
+          <div class="shop-items-grid" id="shop-items-grid">
+            <!-- Shop Cards generated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: Daily Quests (المهام والتحديات اليومية) -->
+      <div id="challenges-screen" class="game-screen">
+        <div class="challenges-layout">
+          <div class="map-intro">
+            أنهِ المهام اليومية المدرجة أدناه لتكسب المزيد من <strong>النجوم السحرية 🌟</strong>. تتجدد هذه المهام تلقائياً كل يوم!
+          </div>
+          
+          <div class="quests-list" id="quests-list">
+            <!-- Quests Cards generated via JS -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Immersive Bottom Nav Navigation -->
+    <nav aria-label="شريط التنقل السفلي للتطبيق">
+      <button class="nav-tab active" data-screen="map" aria-label="شاشة خريطة المستويات">
+        <span class="nav-tab-icon">🗺️</span>
+        <span>الخريطة</span>
+      </button>
+      <button class="nav-tab" data-screen="pet" aria-label="شاشة المرافق الأليف">
+        <span class="nav-tab-icon">🐉</span>
+        <span>الأليف</span>
+      </button>
+      <button class="nav-tab" data-screen="town" aria-label="شاشة مدينتي السحرية">
+        <span class="nav-tab-icon">🏡</span>
+        <span>مدينتي</span>
+      </button>
+      <button class="nav-tab" data-screen="shop" aria-label="شاشة المتجر السحري">
+        <span class="nav-tab-icon">🛒</span>
+        <span>المتجر</span>
+      </button>
+      <button class="nav-tab" data-screen="challenges" aria-label="شاشة المهام والتحديات">
+        <span class="nav-tab-icon">🏆</span>
+        <span>المهام</span>
+      </button>
+    </nav>
+
+    <!-- POPUP MODAL: Interactive Quiz Engine -->
+    <div id="quiz-modal" class="quiz-modal" role="dialog" aria-modal="true" aria-labelledby="quiz-question-box">
+      <div class="quiz-header">
+        <div class="quiz-progress-hud">
+          <div class="quiz-hud-bar">
+            <div class="quiz-hud-fill" id="quiz-hud-fill"></div>
+          </div>
+          <span class="quiz-hud-text" id="quiz-hud-text">السؤال 1 / 5</span>
+        </div>
+        <button class="quiz-close-btn" id="quiz-close-btn" aria-label="إغلاق التحدي">✕</button>
+      </div>
+
+      <div class="quiz-body">
+        <!-- Question content cards (dynamic from mathEngine) -->
+        <div class="quiz-question-box" id="quiz-question-box">
+          <!-- Text and visual SVGs -->
+        </div>
+
+        <!-- Choices buttons grid -->
+        <div class="quiz-choices-grid" id="quiz-choices-grid">
+          <!-- Button options -->
+        </div>
+
+        <!-- Hint block -->
+        <div class="hint-container" id="quiz-hint-container" aria-live="polite">
+          <!-- Hint text goes here -->
+        </div>
+      </div>
+
+      <div class="quiz-footer-actions">
+        <button class="action-btn secondary" id="quiz-hint-btn" aria-label="إظهار تلميح لحل المسألة">💡 تلميح مساعد</button>
+      </div>
+
+      <!-- Internal Feedback/Reward Popup Overlay -->
+      <div class="quiz-feedback-overlay" id="quiz-feedback-overlay" aria-live="assertive">
+        <div class="feedback-icon" id="feedback-icon">🏆</div>
+        <div class="feedback-title" id="feedback-title">رائع! إجابة صحيحة</div>
+        <div class="feedback-message" id="feedback-message">لقد نجحت في اجتياز المستوى بنجاح.</div>
+        
+        <div class="feedback-rewards-list">
+          <div class="feedback-reward-box">
+            <span class="feedback-reward-value stars" id="feedback-stars-val">+15</span>
+            <span class="feedback-reward-label">نجوم سحرية</span>
+          </div>
+          <div class="feedback-reward-box">
+            <span class="feedback-reward-value xp" id="feedback-xp-val">+18 XP</span>
+            <span class="feedback-reward-label">خبرة بطل</span>
+          </div>
+        </div>
+
+        <button class="action-btn" id="feedback-next-btn" style="min-width: 180px;">متابعة الرحلة ➔</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Game Javascript Modules -->
+  <script src="audio.js"></script>
+  <script src="math.js"></script>
+  <script src="app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered with scope: ', reg.scope))
+          .catch(err => console.error('Service Worker registration failed: ', err));
+      });
+    }
+  </script>
+</body>
+</html>
